@@ -46,10 +46,30 @@ def get_student_stats(student_id: int):
     )
     leaves = res.data or []
 
+    # ── Leave Balance ────────────────────────────────────────────────────────
+    ALLOWED_DAYS = 30  # configurable system-wide constant
+    used_days = 0
+    for leave in leaves:
+        if leave["status"] == "accepted":
+            try:
+                from datetime import date as _date
+                start = _date.fromisoformat(leave["start_date"])
+                end = _date.fromisoformat(leave["end_date"])
+                used_days += (end - start).days + 1
+            except Exception:
+                pass
+    remaining = max(0, ALLOWED_DAYS - used_days)
+
     return {
         "totalLeaves": len(leaves),
         "pendingLeaves": sum(1 for l in leaves if l["status"] == "pending"),
         "acceptedLeaves": sum(1 for l in leaves if l["status"] == "accepted"),
         "rejectedLeaves": sum(1 for l in leaves if l["status"] == "rejected"),
         "recentLeaves": leaves[:5],
+        "leaveBalance": {
+            "allowed": ALLOWED_DAYS,
+            "used": used_days,
+            "remaining": remaining,
+        },
     }
+

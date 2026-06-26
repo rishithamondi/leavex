@@ -18,6 +18,7 @@ class LeaveCreate(BaseModel):
 class LeaveStatusUpdate(BaseModel):
     status: str  # 'accepted' | 'rejected'
     user_type: str  # must be 'admin' to update status
+    remarks: Optional[str] = None  # optional warden remarks
 
 
 @router.get("")
@@ -71,12 +72,34 @@ def update_leave_status(leave_id: int, body: LeaveStatusUpdate):
     if body.status not in ("accepted", "rejected"):
         raise HTTPException(status_code=400, detail="Status must be 'accepted' or 'rejected'")
 
+    update_payload: dict = {
+        "status": body.status,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+    if body.remarks is not None:
+        update_payload["remarks"] = body.remarks.strip()
+
     res = (
         supabase.table("leaves")
-        .update({"status": body.status, "updated_at": datetime.now(timezone.utc).isoformat()})
+        .update(update_payload)
         .eq("id", leave_id)
         .execute()
     )
     if not res.data:
         raise HTTPException(status_code=404, detail="Leave not found")
     return res.data[0]
+
+
+@router.get("/{leave_id}")
+def get_leave_by_id(leave_id: int):
+    """Get details of a single leave application, including student info."""
+    res = (
+        supabase.table("leaves")
+        .select("*, students(id, name, reg_no, year_of_study, branch, hostel_room_no)")
+        .eq("id", leave_id)
+        .execute()
+    )
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Leave application not found")
+    return res.data[0]
+

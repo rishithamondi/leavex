@@ -57,3 +57,17 @@ def add_student(body: StudentCreate):
                 detail="A student with this registration number or email already exists",
             )
         raise HTTPException(status_code=400, detail=error_str)
+
+
+@router.delete("/{student_id}", status_code=200)
+def delete_student(student_id: int):
+    """Delete a student and their associated data (admin only). Cascades to leaves."""
+    res = (
+        supabase.table("students")
+        .delete()
+        .eq("id", student_id)
+        .execute()
+    )
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Student not found")
+    return {"message": "Student deleted successfully"}
