@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getStudentStatsApi, type StudentStats } from '@/lib/api';
@@ -13,16 +13,11 @@ const StudentDashboard: React.FC = () => {
     acceptedLeaves: 0,
     rejectedLeaves: 0,
     recentLeaves: [],
+    leaveBalance: { allowed: 30, used: 0, remaining: 30 },
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user?.userType === 'student') {
-      fetchStats();
-    }
-  }, [user]);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     if (user?.userType !== 'student') return;
     try {
       const data = await getStudentStatsApi(user.id);
@@ -32,7 +27,13 @@ const StudentDashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.userType === 'student') {
+      fetchStats();
+    }
+  }, [user, fetchStats]);
 
   const statCards = [
     { title: 'Total Applications', value: stats.totalLeaves, icon: Calendar, color: 'bg-blue-500' },
@@ -68,8 +69,8 @@ const StudentDashboard: React.FC = () => {
           return (
             <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center">
-                <div className={`${card.color} rounded-lg p-3`}>
-                  <Icon className="h-6 w-6 text-white" />
+                <div className="text-indigo-600 p-2 flex items-center justify-center">
+                  <Icon className="h-7 w-7" />
                 </div>
                 <div className="ml-4">
                   <h3 className="text-sm font-medium text-gray-500">{card.title}</h3>
@@ -79,6 +80,53 @@ const StudentDashboard: React.FC = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Leave Balance Card */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <h2 className="text-sm font-semibold text-gray-700 mb-4">Leave Balance (Current Year)</h2>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="text-center p-4 rounded-lg bg-blue-50 border border-blue-100">
+            <p className="text-2xl font-bold text-blue-700">{stats.leaveBalance.allowed}</p>
+            <p className="text-xs font-medium text-blue-500 mt-1">Total Allowed</p>
+          </div>
+          <div className="text-center p-4 rounded-lg bg-orange-50 border border-orange-100">
+            <p className="text-2xl font-bold text-orange-700">{stats.leaveBalance.used}</p>
+            <p className="text-xs font-medium text-orange-500 mt-1">Days Used</p>
+          </div>
+          <div className={`text-center p-4 rounded-lg border ${
+            stats.leaveBalance.remaining <= 5
+              ? 'bg-red-50 border-red-100'
+              : 'bg-green-50 border-green-100'
+          }`}>
+            <p className={`text-2xl font-bold ${
+              stats.leaveBalance.remaining <= 5 ? 'text-red-700' : 'text-green-700'
+            }`}>{stats.leaveBalance.remaining}</p>
+            <p className={`text-xs font-medium mt-1 ${
+              stats.leaveBalance.remaining <= 5 ? 'text-red-500' : 'text-green-500'
+            }`}>Remaining</p>
+          </div>
+        </div>
+        {/* Progress bar */}
+        <div className="mt-4">
+          <div className="flex justify-between text-xs text-gray-500 mb-1">
+            <span>Used: {stats.leaveBalance.used} days</span>
+            <span>{stats.leaveBalance.allowed} days total</span>
+          </div>
+          <div className="w-full bg-gray-100 rounded-full h-2">
+            <div
+              className={`h-2 rounded-full transition-all ${
+                stats.leaveBalance.remaining <= 5 ? 'bg-red-500' : 'bg-indigo-500'
+              }`}
+              style={{
+                width: `${Math.min(
+                  (stats.leaveBalance.used / stats.leaveBalance.allowed) * 100,
+                  100
+                )}%`,
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">

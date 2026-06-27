@@ -33,6 +33,8 @@ export interface Leave {
   status: 'pending' | 'accepted' | 'rejected';
   applied_at: string;
   updated_at: string;
+  remarks?: string;
+  verification_token?: string;
   students?: Student;
 }
 

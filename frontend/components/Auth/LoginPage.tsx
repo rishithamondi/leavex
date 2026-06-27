@@ -38,12 +38,10 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="flex justify-center">
-            <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
-              <GraduationCap className="w-8 h-8 text-indigo-600" />
-            </div>
+          <div className="flex justify-center mb-2">
+            <GraduationCap className="w-12 h-12 text-indigo-600" />
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">LeaveX</h2>
+          <h2 className="text-3xl font-bold text-gray-900">LeaveX</h2>
           <p className="mt-2 text-sm text-gray-600">Hostel Leave Management System</p>
           <p className="mt-1 text-xs text-gray-500">Sign in to your account</p>
         </div>
@@ -118,15 +116,6 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
         </form>
-
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">Login Information:</h3>
-          <div className="text-xs text-gray-600 space-y-1">
-            <p><strong>Admin:</strong> ADM202327 / 22102006</p>
-            <p><strong>Student:</strong> Your Reg No / DOB (YYYYMMDD format)</p>
-            <p className="text-gray-500 mt-2">Note: Only students added by admin can log in</p>
-          </div>
-        </div>
       </div>
     </div>
   );

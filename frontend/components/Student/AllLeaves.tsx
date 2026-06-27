@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Calendar, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getLeavesApi } from '@/lib/api';
@@ -120,9 +121,14 @@ const AllLeaves: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-500 mb-1">Reason</h4>
-                    <p className="text-sm text-gray-900">{leave.reason}</p>
+                  <div className="mt-4 flex justify-between items-center pt-4 border-t border-gray-100">
+                    <span className="text-xs text-gray-400">ID: #{leave.id}</span>
+                    <Link
+                      href={`/student/leaves/${leave.id}`}
+                      className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+                    >
+                      View Details & Timeline →
+                    </Link>
                   </div>
                 </div>
               </div>

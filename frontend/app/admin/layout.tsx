@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Layout/Navbar';
@@ -10,6 +10,7 @@ import Sidebar from '@/components/Layout/Sidebar';
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -32,10 +33,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="flex h-screen pt-16">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+      <Navbar onMenuClick={() => setSidebarOpen((prev) => !prev)} />
+      <div className="flex h-screen pt-16 overflow-hidden">
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

@@ -59,6 +59,39 @@ def add_student(body: StudentCreate):
         raise HTTPException(status_code=400, detail=error_str)
 
 
+class StudentUpdate(BaseModel):
+    name: str
+    phone: str
+    email: str
+    hostel_room_no: str
+    parent_name: str
+    parent_phone: str
+    parent_address: str
+
+
+@router.put("/{student_id}", status_code=200)
+def update_student(student_id: int, body: StudentUpdate):
+    """Update student details (admin only)."""
+    try:
+        res = (
+            supabase.table("students")
+            .update(body.model_dump())
+            .eq("id", student_id)
+            .execute()
+        )
+        if not res.data:
+            raise HTTPException(status_code=404, detail="Student not found")
+        return res.data[0]
+    except Exception as e:
+        error_str = str(e)
+        if "23505" in error_str:
+            raise HTTPException(
+                status_code=409,
+                detail="A student with this email address already exists",
+            )
+        raise HTTPException(status_code=400, detail=error_str)
+
+
 @router.delete("/{student_id}", status_code=200)
 def delete_student(student_id: int):
     """Delete a student and their associated data (admin only). Cascades to leaves."""

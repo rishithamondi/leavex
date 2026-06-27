@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import { UserPlus, Save } from 'lucide-react';
 import { addStudentApi } from '@/lib/api';
+import { useNotifications } from '@/contexts/NotificationContext';
 
 interface StudentFormData {
-  name: string;
+  firstName: string;
+  lastName: string;
   reg_no: string;
   dob: string;
   year_of_study: string;
@@ -19,7 +21,7 @@ interface StudentFormData {
 }
 
 const emptyForm: StudentFormData = {
-  name: '', reg_no: '', dob: '', year_of_study: '', branch: '',
+  firstName: '', lastName: '', reg_no: '', dob: '', year_of_study: '', branch: '',
   phone: '', email: '', hostel_room_no: '', parent_name: '',
   parent_phone: '', parent_address: '',
 };
@@ -27,6 +29,7 @@ const emptyForm: StudentFormData = {
 const yearOptions = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Final Year'];
 
 const AddStudent: React.FC = () => {
+  const { addNotification } = useNotifications();
   const [formData, setFormData] = useState<StudentFormData>(emptyForm);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -48,12 +51,23 @@ const AddStudent: React.FC = () => {
         throw new Error('Year of study and branch are required fields');
       }
 
-      const result = await addStudentApi(formData);
+      const { firstName, lastName, ...rest } = formData;
+      const payload = {
+        name: `${firstName.trim()} ${lastName.trim()}`,
+        ...rest,
+      };
+
+      const result = await addStudentApi(payload);
 
       setMessage({
         type: 'success',
         text: `Student added successfully! Login credentials - Username: ${result.credentials.username}, Password: ${result.credentials.password}`,
       });
+      addNotification(
+        'student_added',
+        'Student Added',
+        `${firstName} ${lastName} (${formData.reg_no}) has been added successfully.`
+      );
       setFormData(emptyForm);
     } catch (error: unknown) {
       setMessage({
@@ -71,7 +85,7 @@ const AddStudent: React.FC = () => {
   const required = <span className="text-red-500">*</span>;
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       <div className="flex items-center mb-6">
         <UserPlus className="h-6 w-6 text-indigo-600 mr-2" />
         <h1 className="text-2xl font-bold text-gray-900">Add New Student</h1>
@@ -97,8 +111,12 @@ const AddStudent: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-900 mb-4">Student Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="name" className={labelClass}>Full Name {required}</label>
-                  <input type="text" id="name" name="name" required value={formData.name} onChange={handleChange} className={inputClass} />
+                  <label htmlFor="firstName" className={labelClass}>First Name {required}</label>
+                  <input type="text" id="firstName" name="firstName" required value={formData.firstName} onChange={handleChange} className={inputClass} />
+                </div>
+                <div>
+                  <label htmlFor="lastName" className={labelClass}>Last Name {required}</label>
+                  <input type="text" id="lastName" name="lastName" required value={formData.lastName} onChange={handleChange} className={inputClass} />
                 </div>
                 <div>
                   <label htmlFor="reg_no" className={labelClass}>Registration Number {required}</label>

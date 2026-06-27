@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Calendar, Send } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Calendar, Send, FileText } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { applyLeaveApi } from '@/lib/api';
+import { useNotifications } from '@/contexts/NotificationContext';
 
 interface LeaveFormData {
   leave_type: string;
@@ -21,9 +22,38 @@ const leaveTypes = [
 
 const ApplyLeave: React.FC = () => {
   const { user } = useAuth();
+  const { addNotification } = useNotifications();
   const [formData, setFormData] = useState<LeaveFormData>(emptyForm);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFileError('');
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+      if (!validTypes.includes(file.type)) {
+        setFileError('Invalid file type. Only PDF, JPG, JPEG, and PNG files are allowed.');
+        e.target.value = '';
+        return;
+      }
+      setUploadedFile(file);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setUploadedFile(null);
+    setFileError('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleReplaceClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -47,6 +77,11 @@ const ApplyLeave: React.FC = () => {
       if (endDate < startDate) throw new Error('End date cannot be before start date');
       if (user?.userType !== 'student') throw new Error('Only students can apply for leave');
 
+      // Conditional File Upload Validation
+      if (formData.leave_type === 'Medical Leave' && !uploadedFile) {
+        throw new Error('Medical certificate is required for Medical Leave');
+      }
+
       await applyLeaveApi({
         student_id: user.id,
         leave_type: formData.leave_type,
@@ -59,7 +94,14 @@ const ApplyLeave: React.FC = () => {
         type: 'success',
         text: 'Leave application submitted successfully! You will be notified once it is reviewed.',
       });
+      addNotification(
+        'leave_submitted',
+        'Leave Application Submitted',
+        `Your ${formData.leave_type} application (${formData.start_date} → ${formData.end_date}) has been submitted and is pending review.`
+      );
       setFormData(emptyForm);
+      setUploadedFile(null);
+      setFileError('');
     } catch (error: unknown) {
       setMessage({
         type: 'error',
@@ -88,7 +130,7 @@ const ApplyLeave: React.FC = () => {
     'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent';
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       <div className="flex items-center mb-6">
         <Calendar className="h-6 w-6 text-indigo-600 mr-2" />
         <h1 className="text-2xl font-bold text-gray-900">Apply for Leave</h1>
@@ -128,20 +170,103 @@ const ApplyLeave: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="start_date" className="block text-sm font-medium text-gray-700 mb-2">
-                  Start Date <span className="text-red-500">*</span>
+              <div className="col-span-1 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Date Range <span className="text-red-500">*</span>
                 </label>
-                <input type="date" id="start_date" name="start_date" required min={minDate} value={formData.start_date} onChange={handleChange} className={inputClass} />
-              </div>
-
-              <div>
-                <label htmlFor="end_date" className="block text-sm font-medium text-gray-700 mb-2">
-                  End Date <span className="text-red-500">*</span>
-                </label>
-                <input type="date" id="end_date" name="end_date" required min={formData.start_date || minDate} value={formData.end_date} onChange={handleChange} className={inputClass} />
+                <div className="flex items-center space-x-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent bg-white">
+                  <input
+                    type="date"
+                    id="start_date"
+                    name="start_date"
+                    required
+                    min={minDate}
+                    value={formData.start_date}
+                    onChange={handleChange}
+                    className="focus:outline-none bg-transparent w-full text-sm text-gray-700 cursor-pointer"
+                  />
+                  <span className="text-gray-400 font-medium text-sm">to</span>
+                  <input
+                    type="date"
+                    id="end_date"
+                    name="end_date"
+                    required
+                    min={formData.start_date || minDate}
+                    value={formData.end_date}
+                    onChange={handleChange}
+                    className="focus:outline-none bg-transparent w-full text-sm text-gray-700 cursor-pointer"
+                  />
+                </div>
               </div>
             </div>
+
+            {/* Conditional File Upload Section */}
+            {(formData.leave_type === 'Medical Leave' || formData.leave_type === 'Academic Leave') && (
+              <div className="border-t border-gray-100 pt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {formData.leave_type === 'Medical Leave' ? (
+                    <>
+                      Medical Certificate Upload <span className="text-red-500">*</span>
+                    </>
+                  ) : (
+                    <>Supporting Document Upload (Optional)</>
+                  )}
+                </label>
+
+                {fileError && (
+                  <p className="text-xs text-red-600 mb-2 font-medium">{fileError}</p>
+                )}
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="hidden"
+                  />
+
+                  {!uploadedFile ? (
+                    <button
+                      type="button"
+                      onClick={handleReplaceClick}
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors bg-white flex items-center gap-1.5"
+                    >
+                      Choose File
+                    </button>
+                  ) : (
+                    <div className="flex items-center justify-between p-3 bg-gray-50/50 border border-gray-200 rounded-lg w-full max-w-md">
+                      <div className="flex items-center gap-2 truncate">
+                        <FileText size={16} className="text-gray-400 flex-shrink-0" />
+                        <span className="text-xs font-medium text-gray-700 truncate" title={uploadedFile.name}>
+                          {uploadedFile.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={handleReplaceClick}
+                          className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline transition-colors"
+                        >
+                          Replace
+                        </button>
+                        <span className="text-gray-300">|</span>
+                        <button
+                          type="button"
+                          onClick={handleRemoveFile}
+                          className="text-xs font-semibold text-red-600 hover:text-red-800 hover:underline transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  Acceptable formats: PDF, JPG, JPEG, PNG
+                </p>
+              </div>
+            )}
 
             <div>
               <label htmlFor="reason" className="block text-sm font-medium text-gray-700 mb-2">

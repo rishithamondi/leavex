@@ -40,11 +40,37 @@ export const addStudentApi = (data: Omit<Student, 'id' | 'created_at'>) =>
     { method: 'POST', body: JSON.stringify(data) }
   );
 
+export const deleteStudentApi = (studentId: number) =>
+  apiFetch<{ message: string }>(`/api/students/${studentId}`, { method: 'DELETE' });
+
+export const updateStudentApi = (
+  studentId: number,
+  data: {
+    name: string;
+    phone: string;
+    email: string;
+    hostel_room_no: string;
+    parent_name: string;
+    parent_phone: string;
+    parent_address: string;
+  }
+) =>
+  apiFetch<Student>(`/api/students/${studentId}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+
 // ─── Leaves ────────────────────────────────────────────────────────────────
 export const getLeavesApi = (studentId?: number) =>
   apiFetch<LeaveWithStudent[] | Leave[]>(
     `/api/leaves${studentId !== undefined ? `?student_id=${studentId}` : ''}`
   );
+
+export const getLeaveByIdApi = (leaveId: number) =>
+  apiFetch<LeaveWithStudent>(`/api/leaves/${leaveId}`);
+
+export const verifyLeaveTokenApi = (token: string) =>
+  apiFetch<LeaveWithStudent>(`/api/leaves/verify/${token}`);
 
 export const applyLeaveApi = (data: {
   student_id: number;
@@ -57,11 +83,12 @@ export const applyLeaveApi = (data: {
 export const updateLeaveStatusApi = (
   leaveId: number,
   status: 'accepted' | 'rejected',
-  userType: string
+  userType: string,
+  remarks?: string
 ) =>
   apiFetch<Leave>(`/api/leaves/${leaveId}`, {
     method: 'PATCH',
-    body: JSON.stringify({ status, user_type: userType }),
+    body: JSON.stringify({ status, user_type: userType, remarks: remarks || null }),
   });
 
 // ─── Dashboard ─────────────────────────────────────────────────────────────
@@ -79,6 +106,11 @@ export interface StudentStats {
   acceptedLeaves: number;
   rejectedLeaves: number;
   recentLeaves: Leave[];
+  leaveBalance: {
+    allowed: number;
+    used: number;
+    remaining: number;
+  };
 }
 
 export const getAdminStatsApi = () =>
