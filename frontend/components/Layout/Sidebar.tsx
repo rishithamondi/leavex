@@ -41,10 +41,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const menuItems = user?.userType === 'admin' ? adminMenuItems : studentMenuItems;
 
-  const getFirstName = (fullName?: string) => {
-    if (!fullName) return 'Student Portal';
-    return fullName.trim().split(/\s+/)[0] || '';
-  };
+
 
   return (
     <>
@@ -64,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-gray-800">
-                {user?.userType === 'admin' ? 'Admin Portal' : `Welcome, ${getFirstName(user?.name)}`}
+                {user?.userType === 'admin' ? 'Admin Portal' : '\u00A0'}
               </h2>
               {onClose && (
                 <button
