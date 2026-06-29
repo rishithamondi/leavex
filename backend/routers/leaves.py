@@ -111,32 +111,6 @@ def update_leave_status(leave_id: int, body: LeaveStatusUpdate):
         )
         if not res.data:
             raise HTTPException(status_code=404, detail="Leave not found")
-            
-        # Email notification (Only when leave request is approved)
-        if body.status == "accepted":
-            try:
-                leave_data = res.data[0]
-                student_res = (
-                    supabase.table("students")
-                    .select("name, email")
-                    .eq("id", leave_data["student_id"])
-                    .execute()
-                )
-                if student_res.data:
-                    student_info = student_res.data[0]
-                    from services.email_service import send_leave_approved_email
-                    send_leave_approved_email(
-                        to_email=student_info["email"],
-                        student_name=student_info["name"],
-                        leave_type=leave_data["leave_type"],
-                        start_date=leave_data["start_date"],
-                        end_date=leave_data["end_date"],
-                        remarks=leave_data.get("remarks")
-                    )
-            except Exception as e:
-                # Catching exceptions to ensure email failures do not affect application flow
-                import logging
-                logging.getLogger("leaves_router").error(f"Failed to process approval email: {str(e)}")
 
         return add_verification_url(res.data[0])
     except Exception as e:

@@ -51,7 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
 
             <button
               onClick={() => setPopoverOpen(!popoverOpen)}
-              className="p-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer focus:outline-none"
+              className="p-2 rounded-lg text-gray-600 hover:text-indigo-600 transition-colors flex items-center justify-center cursor-pointer focus:outline-none"
               title={`${(user?.userType === 'student' ? user.name : undefined) || user?.reg_no} (${user?.userType === 'admin' ? 'Admin' : 'Student'})`}
             >
               <User size={18} />
