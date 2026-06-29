@@ -13,7 +13,7 @@ export default function AdminProfilePage() {
 
   // Admin details
   const adminName = 'System Administrator';
-  const adminEmail = `admin.${user.reg_no.toLowerCase()}@leavex.com`;
+  const adminEmail = 'rishithashivanandh@gmail.com';
 
   const infoItems = [
     { label: 'Admin ID / Reg No', value: user.reg_no, icon: Hash },

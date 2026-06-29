@@ -166,16 +166,16 @@ const LeaveDetails: React.FC<LeaveDetailsProps> = ({ leaveId }) => {
                 <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Leave Type</span>
                 <h2 className="text-xl font-bold text-gray-900 mt-0.5">{leave.leave_type}</h2>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-end">
                 {leave.status === 'accepted' && leave.verification_token && (
                   <button
                     onClick={() => setShowQRModal(true)}
-                    className="inline-flex items-center px-3 py-1.5 border border-indigo-200 text-xs font-semibold rounded-full text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors"
+                    className="inline-flex items-center justify-center px-3 py-1.5 border border-indigo-200 text-xs font-semibold rounded-full text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors whitespace-nowrap"
                   >
                     Show QR
                   </button>
                 )}
-                <span className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusBadgeColor(leave.status)}`}>
+                <span className={`inline-flex items-center justify-center px-3 py-1.5 rounded-full text-xs font-semibold border whitespace-nowrap ${getStatusBadgeColor(leave.status)}`}>
                   {leave.status.charAt(0).toUpperCase() + leave.status.slice(1)}
                 </span>
               </div>

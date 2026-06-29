@@ -13,13 +13,6 @@ const AllApplications: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  // Remarks state: tracks which application is getting a remark & the text
-  const [remarksState, setRemarksState] = useState<{
-    appId: number | null;
-    pendingStatus: 'accepted' | 'rejected' | null;
-    text: string;
-  }>({ appId: null, pendingStatus: null, text: '' });
-
   useEffect(() => {
     fetchApplications();
   }, []);
@@ -35,52 +28,38 @@ const AllApplications: React.FC = () => {
     }
   };
 
-  // Step 1: clicking Accept/Reject opens the remarks input inline
-  const openRemarksFor = (appId: number, status: 'accepted' | 'rejected') => {
-    setRemarksState({ appId, pendingStatus: status, text: '' });
-  };
-
-  // Step 2: confirming submits the update
-  const confirmStatusUpdate = async () => {
-    const { appId, pendingStatus, text } = remarksState;
-    if (!appId || !pendingStatus) return;
-
+  const handleStatusUpdate = async (appId: number, status: 'accepted' | 'rejected') => {
     const app = applications.find((a) => a.id === appId);
 
     try {
-      await updateLeaveStatusApi(appId, pendingStatus, 'admin', text || undefined);
+      await updateLeaveStatusApi(appId, status, 'admin');
       setApplications((prev) =>
         prev.map((a) =>
           a.id === appId
-            ? { ...a, status: pendingStatus, updated_at: new Date().toISOString(), remarks: text || undefined }
+            ? { ...a, status, updated_at: new Date().toISOString() }
             : a
         )
       );
 
       // Notify admin
       addNotification(
-        pendingStatus === 'accepted' ? 'leave_accepted' : 'leave_rejected',
-        `Leave ${pendingStatus === 'accepted' ? 'Approved' : 'Rejected'}`,
-        `${app?.students?.name ?? 'Student'}'s ${app?.leave_type ?? 'leave'} has been ${pendingStatus}.`
+        status === 'accepted' ? 'leave_accepted' : 'leave_rejected',
+        `Leave ${status === 'accepted' ? 'Approved' : 'Rejected'}`,
+        `${app?.students?.name ?? 'Student'}'s ${app?.leave_type ?? 'leave'} has been ${status}.`
       );
       // Notify the student (written to their localStorage key for when they next login)
       if (app?.student_id) {
         addNotificationForUser(
           app.student_id,
-          pendingStatus === 'accepted' ? 'leave_accepted' : 'leave_rejected',
-          `Leave ${pendingStatus === 'accepted' ? 'Approved' : 'Rejected'}`,
-          `Your ${app.leave_type} application (${app.start_date} → ${app.end_date}) was ${pendingStatus} by the warden.`
+          status === 'accepted' ? 'leave_accepted' : 'leave_rejected',
+          `Leave ${status === 'accepted' ? 'Approved' : 'Rejected'}`,
+          `Your ${app.leave_type} application (${app.start_date} → ${app.end_date}) was ${status} by the warden.`
         );
       }
     } catch (error) {
       console.error('Error updating status:', error);
-    } finally {
-      setRemarksState({ appId: null, pendingStatus: null, text: '' });
+      alert(error instanceof Error ? error.message : 'Failed to update leave status. Please try again.');
     }
-  };
-
-  const cancelRemarks = () => {
-    setRemarksState({ appId: null, pendingStatus: null, text: '' });
   };
 
   const filteredApplications = applications.filter((app) => {
@@ -210,55 +189,22 @@ const AllApplications: React.FC = () => {
                   </td>
                   <td className="px-6 py-4">
                     {application.status === 'pending' ? (
-                      remarksState.appId === application.id ? (
-                        /* Inline remarks input */
-                        <div className="w-48 space-y-2">
-                          <textarea
-                            rows={2}
-                            placeholder="Optional remarks..."
-                            value={remarksState.text}
-                            onChange={(e) =>
-                              setRemarksState((prev) => ({ ...prev, text: e.target.value }))
-                            }
-                            className="w-full text-xs px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-400 resize-none"
-                          />
-                          <div className="flex gap-1">
-                            <button
-                              onClick={confirmStatusUpdate}
-                              className={`flex-1 text-xs px-2 py-1 rounded font-medium text-white ${
-                                remarksState.pendingStatus === 'accepted'
-                                  ? 'bg-green-600 hover:bg-green-700'
-                                  : 'bg-red-600 hover:bg-red-700'
-                              }`}
-                            >
-                              Confirm {remarksState.pendingStatus === 'accepted' ? 'Accept' : 'Reject'}
-                            </button>
-                            <button
-                              onClick={cancelRemarks}
-                              className="px-2 py-1 text-xs rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => openRemarksFor(application.id, 'accepted')}
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                          >
-                            <CheckCircle size={14} className="mr-1" />
-                            Accept
-                          </button>
-                          <button
-                            onClick={() => openRemarksFor(application.id, 'rejected')}
-                            className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                          >
-                            <XCircle size={14} className="mr-1" />
-                            Reject
-                          </button>
-                        </div>
-                      )
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleStatusUpdate(application.id, 'accepted')}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        >
+                          <CheckCircle size={14} className="mr-1" />
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => handleStatusUpdate(application.id, 'rejected')}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
+                          <XCircle size={14} className="mr-1" />
+                          Reject
+                        </button>
+                      </div>
                     ) : (
                       <span className="text-sm text-gray-500">
                         {application.status === 'accepted' ? 'Approved' : 'Declined'}
@@ -328,58 +274,22 @@ const AllApplications: React.FC = () => {
               {/* Actions */}
               <div className="pt-1 flex flex-col sm:flex-row gap-2">
                 {application.status === 'pending' ? (
-                  remarksState.appId === application.id ? (
-                    /* Inline remarks input on mobile */
-                    <div className="w-full space-y-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">
-                        Remarks for {remarksState.pendingStatus === 'accepted' ? 'Approval' : 'Rejection'}
-                      </label>
-                      <textarea
-                        rows={2}
-                        placeholder="Provide optional remarks..."
-                        value={remarksState.text}
-                        onChange={(e) =>
-                          setRemarksState((prev) => ({ ...prev, text: e.target.value }))
-                        }
-                        className="w-full text-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none bg-white"
-                      />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={confirmStatusUpdate}
-                          className={`flex-1 text-xs px-3 py-2 rounded-lg font-semibold text-white transition-colors ${
-                            remarksState.pendingStatus === 'accepted'
-                              ? 'bg-green-600 hover:bg-green-700'
-                              : 'bg-red-600 hover:bg-red-700'
-                          }`}
-                        >
-                          Confirm {remarksState.pendingStatus === 'accepted' ? 'Accept' : 'Reject'}
-                        </button>
-                        <button
-                          onClick={cancelRemarks}
-                          className="px-3 py-2 text-xs rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors bg-white font-medium"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2 w-full">
-                      <button
-                        onClick={() => openRemarksFor(application.id, 'accepted')}
-                        className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors"
-                      >
-                        <CheckCircle size={14} className="mr-1.5" />
-                        Accept
-                      </button>
-                      <button
-                        onClick={() => openRemarksFor(application.id, 'rejected')}
-                        className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors"
-                      >
-                        <XCircle size={14} className="mr-1.5" />
-                        Reject
-                      </button>
-                    </div>
-                  )
+                  <div className="flex gap-2 w-full">
+                    <button
+                      onClick={() => handleStatusUpdate(application.id, 'accepted')}
+                      className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 transition-colors"
+                    >
+                      <CheckCircle size={14} className="mr-1.5" />
+                      Accept
+                    </button>
+                    <button
+                      onClick={() => handleStatusUpdate(application.id, 'rejected')}
+                      className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors"
+                    >
+                      <XCircle size={14} className="mr-1.5" />
+                      Reject
+                    </button>
+                  </div>
                 ) : (
                   <div className="text-right text-xs font-semibold text-gray-500 w-full py-1">
                     Processed as:{' '}

@@ -184,7 +184,7 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({ isOpen, onClose 
                 <Mail className="text-gray-400 mt-0.5 flex-shrink-0" size={16} />
                 <div className="min-w-0">
                   <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Email</p>
-                  <p className="text-sm text-gray-700 font-medium truncate">{`admin.${user.reg_no.toLowerCase()}@leavex.com`}</p>
+                  <p className="text-sm text-gray-700 font-medium truncate">rishithashivanandh@gmail.com</p>
                 </div>
               </div>
 
