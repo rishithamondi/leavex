@@ -52,7 +52,7 @@ def send_email(to_email: str, subject: str, html_content: str) -> bool:
 def send_leave_approved_email(to_email: str, student_name: str, leave_type: str, start_date: str, end_date: str, remarks: str = None) -> bool:
     """Sends a professional leave approval notification email."""
     subject = "Leave Application Approved - LeaveX"
-    app_url = os.getenv("NEXT_PUBLIC_APP_URL", "http://localhost:3000")
+    app_url = os.getenv("FRONTEND_URL") or os.getenv("NEXT_PUBLIC_APP_URL") or "http://localhost:3000"
     
     remarks_section = ""
     if remarks:

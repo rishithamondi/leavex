@@ -35,6 +35,7 @@ export interface Leave {
   updated_at: string;
   remarks?: string;
   verification_token?: string;
+  verification_url?: string;
   students?: Student;
 }
 

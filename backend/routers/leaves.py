@@ -3,6 +3,14 @@ from pydantic import BaseModel
 from typing import Optional
 from services.supabase_client import supabase
 from datetime import datetime, timezone
+import os
+
+def add_verification_url(leave_data: dict) -> dict:
+    if leave_data and "verification_token" in leave_data and leave_data["verification_token"]:
+        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+        leave_data["verification_url"] = f"{frontend_url}/verify/{leave_data['verification_token']}"
+    return leave_data
+
 
 router = APIRouter()
 
@@ -43,7 +51,7 @@ def get_leaves(student_id: Optional[int] = None):
             .order("applied_at", desc=True)
             .execute()
         )
-    return res.data
+    return [add_verification_url(leave) for leave in res.data] if res.data else []
 
 
 @router.post("", status_code=201)
@@ -60,7 +68,7 @@ def apply_leave(body: LeaveCreate):
     res = supabase.table("leaves").insert(payload).execute()
     if not res.data:
         raise HTTPException(status_code=400, detail="Failed to submit leave application")
-    return res.data[0]
+    return add_verification_url(res.data[0])
 
 
 @router.patch("/{leave_id}")
@@ -131,7 +139,7 @@ def update_leave_status(leave_id: int, body: LeaveStatusUpdate):
                 import logging
                 logging.getLogger("leaves_router").error(f"Failed to process approval email: {str(e)}")
 
-        return res.data[0]
+        return add_verification_url(res.data[0])
     except Exception as e:
         import traceback
         with open("error.log", "w") as f:
@@ -150,7 +158,7 @@ def verify_leave_token(token: str):
     )
     if not res.data:
         raise HTTPException(status_code=404, detail="Invalid verification token")
-    return res.data[0]
+    return add_verification_url(res.data[0])
 
 
 @router.get("/{leave_id}")
@@ -164,6 +172,6 @@ def get_leave_by_id(leave_id: int):
     )
     if not res.data:
         raise HTTPException(status_code=404, detail="Leave application not found")
-    return res.data[0]
+    return add_verification_url(res.data[0])
 
 

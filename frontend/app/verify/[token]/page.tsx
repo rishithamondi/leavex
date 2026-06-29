@@ -101,7 +101,7 @@ export default function VerificationPage() {
   const isApproved = leave.status === 'accepted' && !isExpired;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 py-12 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 py-8 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
       <div className="max-w-xl w-full mx-auto space-y-6">
         
         {/* Header App Brand */}
@@ -114,7 +114,7 @@ export default function VerificationPage() {
 
         {/* Status Banner */}
         {isApproved && (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center shadow-sm">
+          <div className="bg-green-50 border border-green-200 rounded-2xl px-6 pb-6 pt-4 text-center shadow-sm">
             <div className="flex justify-center mb-2">
               <CheckCircle2 className="w-12 h-12 text-green-500" />
             </div>
@@ -124,7 +124,7 @@ export default function VerificationPage() {
         )}
 
         {isExpired && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center shadow-sm">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl px-6 pb-6 pt-4 text-center shadow-sm">
             <div className="flex justify-center mb-2">
               <AlertTriangle className="w-12 h-12 text-amber-500" />
             </div>
@@ -134,7 +134,7 @@ export default function VerificationPage() {
         )}
 
         {isRejected && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center shadow-sm">
+          <div className="bg-red-50 border border-red-200 rounded-2xl px-6 pb-6 pt-4 text-center shadow-sm">
             <div className="flex justify-center mb-2">
               <XCircle className="w-12 h-12 text-red-500" />
             </div>
@@ -144,7 +144,7 @@ export default function VerificationPage() {
         )}
 
         {!isApproved && !isExpired && !isRejected && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 text-center shadow-sm">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl px-6 pb-6 pt-4 text-center shadow-sm">
             <div className="flex justify-center mb-2">
               <Clock className="w-12 h-12 text-yellow-500" />
             </div>

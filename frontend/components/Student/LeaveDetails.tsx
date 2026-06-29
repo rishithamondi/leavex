@@ -32,16 +32,14 @@ const LeaveDetails: React.FC<LeaveDetailsProps> = ({ leaveId }) => {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
 
   useEffect(() => {
-    if (leave?.verification_token) {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const verifyUrl = `${appUrl}/verify/${leave.verification_token}`;
+    if (leave?.verification_url) {
       import('qrcode').then((QRCode) => {
-        QRCode.toDataURL(verifyUrl, { width: 256, margin: 2 })
+        QRCode.toDataURL(leave.verification_url!, { width: 256, margin: 2 })
           .then((url) => setQrCodeDataUrl(url))
           .catch((err) => console.error('Error generating QR code:', err));
       });
     }
-  }, [leave?.verification_token]);
+  }, [leave?.verification_url]);
 
   useEffect(() => {
     if (user) {
@@ -170,7 +168,7 @@ const LeaveDetails: React.FC<LeaveDetailsProps> = ({ leaveId }) => {
                 {leave.status === 'accepted' && leave.verification_token && (
                   <button
                     onClick={() => setShowQRModal(true)}
-                    className="inline-flex items-center px-3 py-1.5 border border-indigo-200 text-xs font-semibold rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors"
+                    className="inline-flex items-center px-3 py-1.5 border border-indigo-200 text-xs font-semibold rounded-full text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors"
                   >
                     Show QR
                   </button>
