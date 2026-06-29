@@ -17,6 +17,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { getLeaveByIdApi } from '@/lib/api';
 import type { LeaveWithStudent } from '@/lib/types';
+import { getVerificationUrl } from '@/lib/utils';
 
 interface LeaveDetailsProps {
   leaveId: number;
@@ -32,14 +33,15 @@ const LeaveDetails: React.FC<LeaveDetailsProps> = ({ leaveId }) => {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
 
   useEffect(() => {
-    if (leave?.verification_url) {
+    if (leave?.verification_token) {
+      const verifyUrl = getVerificationUrl(leave.verification_token, leave.verification_url);
       import('qrcode').then((QRCode) => {
-        QRCode.toDataURL(leave.verification_url!, { width: 256, margin: 2 })
+        QRCode.toDataURL(verifyUrl, { width: 256, margin: 2 })
           .then((url) => setQrCodeDataUrl(url))
           .catch((err) => console.error('Error generating QR code:', err));
       });
     }
-  }, [leave?.verification_url]);
+  }, [leave?.verification_token, leave?.verification_url]);
 
   useEffect(() => {
     if (user) {

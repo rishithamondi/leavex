@@ -3,12 +3,11 @@ from pydantic import BaseModel
 from typing import Optional
 from services.supabase_client import supabase
 from datetime import datetime, timezone
-import os
+from utils.url import get_verification_url
 
 def add_verification_url(leave_data: dict) -> dict:
     if leave_data and "verification_token" in leave_data and leave_data["verification_token"]:
-        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
-        leave_data["verification_url"] = f"{frontend_url}/verify/{leave_data['verification_token']}"
+        leave_data["verification_url"] = get_verification_url(leave_data["verification_token"])
     return leave_data
 
 

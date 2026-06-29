@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from services.supabase_client import supabase
+from routers.leaves import add_verification_url
 
 router = APIRouter()
 
@@ -65,7 +66,7 @@ def get_student_stats(student_id: int):
         "pendingLeaves": sum(1 for l in leaves if l["status"] == "pending"),
         "acceptedLeaves": sum(1 for l in leaves if l["status"] == "accepted"),
         "rejectedLeaves": sum(1 for l in leaves if l["status"] == "rejected"),
-        "recentLeaves": leaves[:5],
+        "recentLeaves": [add_verification_url(l) for l in leaves[:5]],
         "leaveBalance": {
             "allowed": ALLOWED_DAYS,
             "used": used_days,
