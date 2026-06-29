@@ -86,15 +86,15 @@ const StudentDashboard: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
         <h2 className="text-sm font-semibold text-gray-700 mb-4">Leave Balance (Current Year)</h2>
         <div className="grid grid-cols-3 gap-4">
-          <div className="text-center p-4 rounded-lg bg-blue-50 border border-blue-100">
+          <div className="flex flex-col items-center justify-center text-center p-4 rounded-lg bg-blue-50 border border-blue-100">
             <p className="text-2xl font-bold text-blue-700">{stats.leaveBalance.allowed}</p>
-            <p className="text-xs font-medium text-blue-500 mt-1">Total Allowed</p>
+            <p className="text-xs font-semibold text-blue-500 mt-1">Allowed</p>
           </div>
-          <div className="text-center p-4 rounded-lg bg-orange-50 border border-orange-100">
+          <div className="flex flex-col items-center justify-center text-center p-4 rounded-lg bg-orange-50 border border-orange-100">
             <p className="text-2xl font-bold text-orange-700">{stats.leaveBalance.used}</p>
-            <p className="text-xs font-medium text-orange-500 mt-1">Days Used</p>
+            <p className="text-xs font-semibold text-orange-500 mt-1">Used</p>
           </div>
-          <div className={`text-center p-4 rounded-lg border ${
+          <div className={`flex flex-col items-center justify-center text-center p-4 rounded-lg border ${
             stats.leaveBalance.remaining <= 5
               ? 'bg-red-50 border-red-100'
               : 'bg-green-50 border-green-100'
@@ -102,7 +102,7 @@ const StudentDashboard: React.FC = () => {
             <p className={`text-2xl font-bold ${
               stats.leaveBalance.remaining <= 5 ? 'text-red-700' : 'text-green-700'
             }`}>{stats.leaveBalance.remaining}</p>
-            <p className={`text-xs font-medium mt-1 ${
+            <p className={`text-xs font-semibold mt-1 ${
               stats.leaveBalance.remaining <= 5 ? 'text-red-500' : 'text-green-500'
             }`}>Remaining</p>
           </div>

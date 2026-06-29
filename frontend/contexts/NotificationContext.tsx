@@ -42,6 +42,7 @@ interface NotificationContextType {
   markOneRead: (id: string) => void;
   markAllRead: () => void;
   clearAll: () => void;
+  deleteOne: (id: string) => void;
 }
 
 // ─── Context ────────────────────────────────────────────────────────────────
@@ -152,11 +153,15 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     setNotifications([]);
   }, []);
 
+  const deleteOne = useCallback((id: string) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  }, []);
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, unreadCount, addNotification, addNotificationForUser, markOneRead, markAllRead, clearAll }}
+      value={{ notifications, unreadCount, addNotification, addNotificationForUser, markOneRead, markAllRead, clearAll, deleteOne }}
     >
       {children}
     </NotificationContext.Provider>

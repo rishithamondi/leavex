@@ -84,7 +84,7 @@ export default function VerificationPage() {
           </div>
 
           <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center space-y-2">
-            <p className="text-sm font-semibold text-red-800">🔴 Invalid / Expired Token</p>
+            <p className="text-sm font-semibold text-red-800">Invalid / Expired Token</p>
             <p className="text-xs text-red-600 leading-relaxed">
               This QR code is invalid, modified, or has been revoked by the hostel administration. Please check the source of the QR code.
             </p>
@@ -106,12 +106,10 @@ export default function VerificationPage() {
         
         {/* Header App Brand */}
         <div className="text-center">
-          <div className="flex justify-center mb-2">
-            <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-indigo-600" />
-            </div>
+          <div className="flex justify-center mb-4">
+            <GraduationCap className="w-14 h-14 text-indigo-600" strokeWidth={1.5} />
           </div>
-          <h2 className="text-lg font-bold text-gray-900 tracking-tight font-sans">LeaveX Verification Portal</h2>
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight font-sans">LeaveX Verification Portal</h2>
         </div>
 
         {/* Status Banner */}
@@ -120,7 +118,7 @@ export default function VerificationPage() {
             <div className="flex justify-center mb-2">
               <CheckCircle2 className="w-12 h-12 text-green-500" />
             </div>
-            <h3 className="text-xl font-bold text-green-800">🟢 Approved</h3>
+            <h3 className="text-xl font-bold text-green-800">Approved</h3>
             <p className="text-xs text-green-600 mt-1 font-medium">This leave is active and approved by the warden.</p>
           </div>
         )}
@@ -130,7 +128,7 @@ export default function VerificationPage() {
             <div className="flex justify-center mb-2">
               <AlertTriangle className="w-12 h-12 text-amber-500" />
             </div>
-            <h3 className="text-xl font-bold text-amber-800">🟠 Expired</h3>
+            <h3 className="text-xl font-bold text-amber-800">Expired</h3>
             <p className="text-xs text-amber-600 mt-1 font-medium">This leave was approved but the end date has passed.</p>
           </div>
         )}
@@ -140,7 +138,7 @@ export default function VerificationPage() {
             <div className="flex justify-center mb-2">
               <XCircle className="w-12 h-12 text-red-500" />
             </div>
-            <h3 className="text-xl font-bold text-red-800">🔴 Rejected</h3>
+            <h3 className="text-xl font-bold text-red-800">Rejected</h3>
             <p className="text-xs text-red-600 mt-1 font-medium">This leave request was rejected by the warden.</p>
           </div>
         )}
@@ -150,7 +148,7 @@ export default function VerificationPage() {
             <div className="flex justify-center mb-2">
               <Clock className="w-12 h-12 text-yellow-500" />
             </div>
-            <h3 className="text-xl font-bold text-yellow-800">🟡 Pending Review</h3>
+            <h3 className="text-xl font-bold text-yellow-800">Pending Review</h3>
             <p className="text-xs text-yellow-600 mt-1 font-medium">This leave is currently pending warden approval.</p>
           </div>
         )}
@@ -219,10 +217,7 @@ export default function VerificationPage() {
           </div>
         </div>
 
-        {/* Footer */}
-        <p className="text-center text-xxs text-gray-400">
-          LeaveX Security Verification Protocol. Authenticated via Supabase database services.
-        </p>
+
       </div>
     </div>
   );

@@ -11,7 +11,6 @@ import {
   ClipboardList,
   CalendarDays,
   X,
-  LogOut,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -100,15 +99,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             </nav>
           </div>
 
-          <div className="pt-4 border-t border-gray-100">
-            <button
-              onClick={logout}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-left rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
-            >
-              <LogOut size={20} />
-              <span className="font-medium">Logout</span>
-            </button>
-          </div>
+          {/* Removed Logout from sidebar, now in Profile */}
         </div>
       </aside>
     </>

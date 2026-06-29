@@ -65,6 +65,8 @@ CREATE TABLE leaves (
     end_date DATE NOT NULL,
     reason TEXT NOT NULL,
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
+    remarks TEXT,
+    verification_token VARCHAR(255),
     applied_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

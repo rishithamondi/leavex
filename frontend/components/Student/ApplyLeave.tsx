@@ -174,7 +174,7 @@ const ApplyLeave: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Date Range <span className="text-red-500">*</span>
                 </label>
-                <div className="flex items-center space-x-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent bg-white">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
                   <input
                     type="date"
                     id="start_date"
@@ -183,9 +183,9 @@ const ApplyLeave: React.FC = () => {
                     min={minDate}
                     value={formData.start_date}
                     onChange={handleChange}
-                    className="focus:outline-none bg-transparent w-full text-sm text-gray-700 cursor-pointer"
+                    className={`${inputClass} cursor-pointer`}
                   />
-                  <span className="text-gray-400 font-medium text-sm">to</span>
+                  <span className="text-gray-400 font-medium text-sm text-center">to</span>
                   <input
                     type="date"
                     id="end_date"
@@ -194,7 +194,7 @@ const ApplyLeave: React.FC = () => {
                     min={formData.start_date || minDate}
                     value={formData.end_date}
                     onChange={handleChange}
-                    className="focus:outline-none bg-transparent w-full text-sm text-gray-700 cursor-pointer"
+                    className={`${inputClass} cursor-pointer`}
                   />
                 </div>
               </div>
@@ -273,7 +273,6 @@ const ApplyLeave: React.FC = () => {
                 Reason for Leave <span className="text-red-500">*</span>
               </label>
               <textarea id="reason" name="reason" rows={4} required value={formData.reason} onChange={handleChange} placeholder="Please provide a detailed reason for your leave application..." className={inputClass} />
-              <p className="mt-1 text-sm text-gray-500">Provide a clear and detailed reason for your leave request.</p>
             </div>
 
             {calculateDuration() > 0 && (

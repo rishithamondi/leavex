@@ -523,7 +523,7 @@ const AdminDashboard: React.FC = () => {
               </h2>
               <p className="text-xs text-gray-500">Students currently checked out on approved leave</p>
             </div>
-            <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded-lg">
+            <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded-lg whitespace-nowrap flex-shrink-0">
               {outsideStudents.length} outside
             </span>
           </div>
@@ -568,7 +568,7 @@ const AdminDashboard: React.FC = () => {
               </h2>
               <p className="text-xs text-gray-500">Students whose approved leaves end today ({new Date().toLocaleDateString(undefined, {month: 'short', day: 'numeric'})})</p>
             </div>
-            <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded-lg">
+            <span className="text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded-lg whitespace-nowrap flex-shrink-0">
               {returningStudents.length} due
             </span>
           </div>

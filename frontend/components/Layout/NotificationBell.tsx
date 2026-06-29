@@ -16,7 +16,7 @@ import {
 import { useNotifications, type AppNotification } from '@/contexts/NotificationContext';
 
 const NotificationBell: React.FC = () => {
-  const { notifications, unreadCount, markOneRead, markAllRead, clearAll } = useNotifications();
+  const { notifications, unreadCount, markOneRead, markAllRead, clearAll, deleteOne } = useNotifications();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -103,9 +103,17 @@ const NotificationBell: React.FC = () => {
         )}
       </button>
 
+      {/* Mobile view backdrop */}
+      {open && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 md:hidden animate-fade-in" onClick={() => setOpen(false)} />
+      )}
+
       {/* Dropdown Panel */}
       {open && (
-        <div className="absolute right-0 top-12 w-80 bg-white rounded-xl shadow-lg border border-gray-200 z-50 overflow-hidden">
+        <div className="
+          fixed bottom-0 left-0 right-0 max-h-[80vh] rounded-t-2xl z-50 bg-white shadow-2xl border-t border-gray-200 overflow-y-auto animate-slide-up
+          md:absolute md:bottom-auto md:left-auto md:right-0 md:top-12 md:w-80 md:rounded-xl md:shadow-lg md:border md:overflow-hidden md:animate-fade-in
+        ">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
             <h3 className="text-sm font-semibold text-gray-900">
@@ -154,27 +162,42 @@ const NotificationBell: React.FC = () => {
               </div>
             ) : (
               notifications.map((n) => (
-                <button
+                <div
                   key={n.id}
-                  onClick={() => markOneRead(n.id)}
-                  className={`w-full text-left px-4 py-3 transition-colors hover:bg-gray-50 flex items-start gap-3 ${
+                  className={`group relative w-full text-left px-4 py-3 transition-colors hover:bg-gray-50/80 flex items-start justify-between gap-3 ${
                     !n.read ? 'bg-indigo-50/40' : 'bg-white'
                   }`}
                 >
-                  {renderNotificationIcon(n.type)}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-1.5">
-                      <p className={`text-xs font-bold leading-tight ${!n.read ? 'text-gray-900 font-extrabold' : 'text-gray-700'}`}>
-                        {n.title}
-                      </p>
-                      {!n.read && (
-                        <span className="h-1.5 w-1.5 bg-indigo-500 rounded-full flex-shrink-0 mt-1" />
-                      )}
+                  <button
+                    onClick={() => markOneRead(n.id)}
+                    className="flex-1 text-left flex items-start gap-3 min-w-0 focus:outline-none"
+                  >
+                    {renderNotificationIcon(n.type)}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-1.5">
+                        <p className={`text-xs font-bold leading-tight ${!n.read ? 'text-gray-900 font-extrabold' : 'text-gray-700'}`}>
+                          {n.title}
+                        </p>
+                        {!n.read && (
+                          <span className="h-1.5 w-1.5 bg-indigo-500 rounded-full flex-shrink-0 mt-1" />
+                        )}
+                      </div>
+                      <p className="text-[11px] text-gray-500 mt-1 leading-relaxed line-clamp-2">{n.message}</p>
+                      <p className="text-[9px] text-gray-400 font-semibold tracking-wide uppercase mt-1.5">{formatTime(n.timestamp)}</p>
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-1 leading-relaxed line-clamp-2">{n.message}</p>
-                    <p className="text-[9px] text-gray-400 font-semibold tracking-wide uppercase mt-1.5">{formatTime(n.timestamp)}</p>
-                  </div>
-                </button>
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteOne(n.id);
+                    }}
+                    className="p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors self-center opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                    title="Delete notification"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
               ))
             )}
           </div>

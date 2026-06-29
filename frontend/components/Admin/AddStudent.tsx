@@ -26,7 +26,7 @@ const emptyForm: StudentFormData = {
   parent_phone: '', parent_address: '',
 };
 
-const yearOptions = ['1st Year', '2nd Year', '3rd Year', '4th Year', 'Final Year'];
+const yearOptions = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', '6th Year', 'Final Year'];
 
 const AddStudent: React.FC = () => {
   const { addNotification } = useNotifications();

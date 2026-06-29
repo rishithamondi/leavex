@@ -1,16 +1,19 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { LogOut, User, Home, Menu } from 'lucide-react';
+import { LogOut, User, Home, Menu, GraduationCap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import NotificationBell from '@/components/Layout/NotificationBell';
+import { ProfilePopover } from '@/components/Layout/ProfilePopover';
 
 interface NavbarProps {
   onMenuClick?: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   const dashboardPath =
     user?.userType === 'admin' ? '/admin/dashboard' : '/student/dashboard';
@@ -29,12 +32,13 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                 <Menu size={20} />
               </button>
             )}
-            <Link href={dashboardPath} className="flex-shrink-0">
+            <Link href={dashboardPath} className="flex-shrink-0 flex items-center gap-2">
+              <GraduationCap className="w-7 h-7 text-indigo-600" />
               <h1 className="text-xl font-bold text-indigo-600">LeaveX</h1>
             </Link>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 relative">
             <Link
               href={dashboardPath}
               className="p-2 rounded-lg text-gray-600 hover:text-indigo-600 transition-colors flex items-center justify-center"
@@ -45,12 +49,15 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
 
             <NotificationBell />
 
-            <div
-              className="p-2 rounded-lg text-gray-600 hover:text-indigo-600 transition-colors flex items-center justify-center cursor-default"
+            <button
+              onClick={() => setPopoverOpen(!popoverOpen)}
+              className="p-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer focus:outline-none"
               title={`${(user?.userType === 'student' ? user.name : undefined) || user?.reg_no} (${user?.userType === 'admin' ? 'Admin' : 'Student'})`}
             >
               <User size={18} />
-            </div>
+            </button>
+
+            <ProfilePopover isOpen={popoverOpen} onClose={() => setPopoverOpen(false)} />
           </div>
         </div>
       </div>
